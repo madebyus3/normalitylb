@@ -1,10 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Cart</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart - Normalitylb</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-  <h1>Cart Page</h1>
+
+    <!-- Header -->
+    <header class="header">
+    <div class="header-container">
+        <div class="logo">
+            <a href="index.html">Normalitylb</a>
+        </div>
+
+         <!-- NAVIGATION -->
+<nav class="nav" id="navMenu">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="products.html" class="nav-link">Products</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="orders.html" class="nav-link">Orders</a>
+</nav>
+
+<!-- HAMBURGER BUTTON -->
+<button class="menu-btn" id="menuBtn">
+    ☰
+</button>
+
+        <!-- CART WITH LINK (IMPORTANT!!) -->
+        <a href="cart.html" class="cart-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
+            </svg>
+            <span class="cart-count">0</span>
+        </a>
+    </div>
+</header>
+
+    <main class="page-wrapper">
+        <section class="products-hero">
+            <h1>Your Shopping Cart</h1>
+            <p>Review your selected items</p>
+        </section>
+
+        <section class="products-section">
+            <div class="products-container">
+
+                <!-- Cart Items List -->
+                <div id="cartItems"></div>
+
+                <!-- Cart Summary -->
+<div id="cartSummary" style="margin-top: 3rem; text-align: right; font-size: 1.3rem;">
+    <strong>Total:</strong> <span id="cartTotal" style="color:#c3026c;">$0.00</span>
+
+    <br><br>
+    <button id="checkoutBtn" style="
+        padding: 1rem 2.5rem;
+        background: #c3026c;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(195, 2, 108, 0.3);
+        ">
+        Checkout
+    </button>
+</div>
+
+        </section>
+    </main>
+
+    <script>
+        // Load cart
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        const cartItemsContainer = document.getElementById("cartItems");
+        const cartTotalElement = document.getElementById("cartTotal");
+
+        function updateCartPage() {
+            cartItemsContainer.innerHTML = "";
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = `
+                    <p style="text-align:center; font-size:1.25rem; color:#6b7280;">
+                        Your cart is empty.
+                    </p>
+                `;
+                cartTotalElement.textContent = "$0.00";
+                return;
+            }
+
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                const price = parseFloat(item.price.replace("$", ""));
+                total += price;
+
+                cartItemsContainer.innerHTML += `
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        background: white;
+                        padding: 1rem;
+                        border-radius: 1rem;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                        margin-bottom: 1.5rem;
+                    ">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <img src="${item.image}" 
+                                 style="width: 90px; height: 90px; border-radius: 0.5rem; object-fit: cover;">
+                            <div>
+                                <h3 style="font-size: 1.25rem; margin-bottom: 0.25rem;">${item.name}</h3>
+                                <p style="color:#c3026c; font-weight:bold;">${item.price}</p>
+                            </div>
+                        </div>
+
+                        <button onclick="removeItem(${index})" 
+                            style="
+                                background:#ef4444;
+                                color:white;
+                                border:none;
+                                padding:0.5rem 1rem;
+                                border-radius:0.5rem;
+                                cursor:pointer;
+                                font-weight:600;
+                            ">
+                            Remove
+                        </button>
+                    </div>
+                `;
+            });
+
+            cartTotalElement.textContent = "$" + total.toFixed(2);
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            updateCartPage();
+        }
+
+        updateCartPage();
+
+        // بعد updateCartPage(); ضع هذا
+document.getElementById("checkoutBtn").addEventListener("click", () => {
+    // نفتح صفحة checkout.html في نافذة جديدة/نفس التبويب حسب رغبتك - هنا نفّتح بنفس النافذة
+    window.location.href = "checkout.html";
+});
+
+    </script>
+
 </body>
 </html>
