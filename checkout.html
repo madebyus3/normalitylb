@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout - Normalitylb</title>
-<link rel="stylesheet" href="styles.css">
+
 <style>
+body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0}
 .checkout-wrapper{
 max-width:980px;
 margin:3.5rem auto;
@@ -48,281 +49,157 @@ margin-top:1rem;
 }
 </style>
 </head>
+
 <body>
 
-<header class="header">
-<div class="header-container">
-<div class="logo"><a href="index.html">Normalitylb</a></div>
- <!-- NAVIGATION -->
-<nav class="nav" id="navMenu">
-    <a href="index.html" class="nav-link">Home</a>
-    <a href="products.html" class="nav-link">Products</a>
-    <a href="about.html" class="nav-link">About</a>
-    <a href="contact.html" class="nav-link">Contact</a>
-    <a href="orders.html" class="nav-link">Orders</a>
-</nav>
-
-<!-- HAMBURGER BUTTON -->
-<button class="menu-btn" id="menuBtn">
-    ☰
-</button>
-<a href="cart.html" class="cart-icon">
-<svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none">
-<circle cx="9" cy="21" r="1"></circle>
-<circle cx="20" cy="21" r="1"></circle>
-<path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
-</svg>
-<span class="cart-count">0</span>
-</a>
-</div>
-</header>
-
-<main class="page-wrapper">
-<section class="products-hero">
-<h1>Checkout</h1>
-<p>Fill your information to complete the order</p>
-</section>
+<main>
+<h1 style="text-align:center;margin-top:2rem">Checkout</h1>
 
 <div class="checkout-wrapper">
-<!-- LEFT FORM -->
+
+<!-- FORM -->
 <div class="checkout-card">
-<h2 style="color:#c3026c;margin-bottom:.75rem">Shipping & Contact</h2>
+<h2 style="color:#c3026c">Shipping & Contact</h2>
+
 <form id="checkoutForm">
 <div class="form-group">
 <label>Full name</label>
 <input id="fullName" required>
 </div>
+
 <div class="form-group">
 <label>Phone</label>
 <input id="phone" required>
 </div>
-<div class="form-group">
-<label>Address</label>
-<input id="address" required>
-</div>
+
 <div class="form-group">
 <label>City</label>
 <input id="city" required>
 </div>
+
+<div class="form-group">
+<label>Address</label>
+<input id="address" required>
+</div>
+
 <div class="form-group">
 <label>Notes</label>
 <textarea id="notes"></textarea>
 </div>
+
 <div class="form-group">
 <label>Promo code</label>
-<input id="Promocode">
+<input id="promoCode">
 </div>
+
 <div class="form-group">
-<label>Payment method</label>
+<label>Delivery method</label>
 <select id="paymentMethod">
-<option value="cash">Cash on delivery (Delivery +$4)</option>
-<option value="pickup">Pick up from Dbaye (Free)</option>
+<option value="cash">Cash on delivery (+$4)</option>
+<option value="pickup">Pickup from Dbaye (Free)</option>
 </select>
 </div>
-<button class="btn-place-order">Place Order</button>
+
+<button class="btn-place-order" type="submit">Place Order</button>
 </form>
 </div>
 
-<!-- RIGHT SUMMARY -->
-<aside class="checkout-card checkout-summary">
+<!-- SUMMARY -->
+<aside class="checkout-card">
 <h3>Order Summary</h3>
+
 <div id="summaryItems"></div>
 <hr>
+
 <div class="summary-item">
 <strong>Subtotal</strong>
-<span id="summarySubtotal">$0.00</span>
+<span id="subtotal">$0.00</span>
 </div>
-<div class="summary-item" id="discountRow" style="display:none">
-<strong>Discount</strong>
-<span id="summaryDiscount">-$0.00</span>
-</div>
-<div class="summary-item" id="shippingRow">
+
+<div class="summary-item">
 <strong>Shipping</strong>
-<span id="summaryShipping">Calculated</span>
+<span id="shipping">$0.00</span>
 </div>
+
 <div class="summary-item" style="font-size:1.2rem">
 <strong>Total</strong>
-<strong id="summaryTotal" style="color:#c3026c">$0.00</strong>
+<strong id="total" style="color:#c3026c">$0.00</strong>
 </div>
 </aside>
+
 </div>
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <script>
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-document.querySelector(".cart-count").textContent = cart.length;
-
-const summaryItems = document.getElementById("summaryItems");
-const subtotalEl = document.getElementById("summarySubtotal");
-const totalEl = document.getElementById("summaryTotal");
-const promoInput = document.getElementById("Promocode");
-const discountRow = document.getElementById("discountRow");
-const discountEl = document.getElementById("summaryDiscount");
-const shippingEl = document.getElementById("summaryShipping");
-const paymentMethod = document.getElementById("paymentMethod");
-
-let subtotal = 0;
-let discount = 0;
-let shippingCost = 0;
-
-const PROMO_CODE = "FIRST10";
-const PROMO_KEY = "promo_FIRST10_used";
 const WHATSAPP_NUMBER = "96176370139";
+const PROMO_CODE = "FIRST10";
 
-function extractPrice(val){
-return parseFloat(String(val).replace(/[^0-9.]/g,"")) || 0;
-}
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+let discount = 0;
+
+function price(v){return parseFloat(String(v).replace(/[^0-9.]/g,""))||0;}
 
 function renderSummary(){
-summaryItems.innerHTML="";
-subtotal=0;
-cart.forEach(item=>{
-const price = extractPrice(item.price);
-subtotal += price;
-summaryItems.innerHTML += `<div class="summary-item"><span>${item.name}</span><span>$${price.toFixed(2)}</span></div>`;
+let subtotal=0;
+let itemsHTML="";
+cart.forEach(i=>{
+let p=price(i.price);
+subtotal+=p;
+itemsHTML+=`<div class="summary-item"><span>${i.name}</span><span>$${p.toFixed(2)}</span></div>`;
 });
-subtotalEl.textContent="$"+subtotal.toFixed(2);
-calculateTotal();
+document.getElementById("summaryItems").innerHTML=itemsHTML;
+document.getElementById("subtotal").textContent="$"+subtotal.toFixed(2);
+calcTotal(subtotal);
 }
 
-function calculateTotal(){
-const method = paymentMethod.value;
-shippingCost = method==="cash" ? 4 : 0;
-shippingEl.textContent = shippingCost>0 ? "$"+shippingCost.toFixed(2) : "Free";
-
-let total=subtotal;
-if(discount>0){ 
-let d=subtotal*discount;
-discountEl.textContent="-$"+d.toFixed(2);
-discountRow.style.display="flex";
-total-=d;
-}else{ discountRow.style.display="none"; }
-
-total += shippingCost;
-totalEl.textContent="$"+total.toFixed(2);
+function calcTotal(subtotal){
+let shipping=document.getElementById("paymentMethod").value==="cash"?4:0;
+let total=subtotal-(subtotal*discount)+shipping;
+document.getElementById("shipping").textContent=shipping?"$4.00":"Free";
+document.getElementById("total").textContent="$"+total.toFixed(2);
+return total;
 }
 
-// Promo code once
-promoInput.addEventListener("input",()=>{
-const code = promoInput.value.trim().toUpperCase();
-if(code===PROMO_CODE){
-if(localStorage.getItem(PROMO_KEY)==="true"){
-discount=0;
-alert("❌ Promo already used");
-}else{
-discount=0.10;
-localStorage.setItem(PROMO_KEY,"true");
-alert("✅ 10% OFF applied");
-}
-}else{ discount=0; }
-calculateTotal();
+document.getElementById("promoCode").addEventListener("input",e=>{
+discount=e.target.value.trim().toUpperCase()===PROMO_CODE?0.1:0;
+renderSummary();
 });
 
-// Update total when payment method changes
-paymentMethod.addEventListener("change", calculateTotal);
+document.getElementById("paymentMethod").addEventListener("change",renderSummary);
 
-// Generate PDF
-function generateOrderPDF(order){
-const { jsPDF } = window.jspdf;
-const doc = new jsPDF();
-let y=20;
-doc.setFontSize(18);
-doc.text("Normalitylb - Order Invoice",20,y); y+=10;
-doc.setFontSize(11);
-doc.text("Order ID: "+order.id,20,y); y+=7;
-doc.text("Date: "+order.date,20,y); y+=10;
-doc.text("Customer:",20,y); y+=7;
-doc.text("Name: "+order.customer.name,20,y); y+=6;
-doc.text("Phone: "+order.customer.phone,20,y); y+=6;
-doc.text("City: "+order.customer.city,20,y); y+=6;
-doc.text("Address: "+order.customer.address,20,y); y+=6;
-doc.text("Notes: "+(order.customer.notes||"None"),20,y); y+=10;
-doc.text("Products:",20,y); y+=6;
-order.items.forEach(i=>{
-const p=extractPrice(i.price);
-doc.text(`- ${i.name}: $${p.toFixed(2)}`,25,y);
-y+=6;
-});
-y+=6;
-doc.text("Subtotal: $"+order.subtotal.toFixed(2),20,y); y+=6;
-doc.text("Discount: "+order.discountPercent.toFixed(0)+"%",20,y); y+=6;
-doc.text("Shipping: $"+order.shipping.toFixed(2),20,y); y+=6;
-doc.text("Total: $"+order.total.toFixed(2),20,y);
-doc.save(order.id+".pdf");
-}
-
-// Submit
-document.getElementById("checkoutForm").addEventListener("submit", e=>{
+document.getElementById("checkoutForm").addEventListener("submit",e=>{
 e.preventDefault();
-if(cart.length===0){ alert("Your cart is empty"); return; }
+if(cart.length===0){alert("Cart empty");return;}
 
-const method = paymentMethod.value;
-shippingCost = method==="cash"?4:0;
+let subtotal=cart.reduce((s,i)=>s+price(i.price),0);
+let shipping=document.getElementById("paymentMethod").value==="cash"?4:0;
+let total=subtotal-(subtotal*discount)+shipping;
 
-const order={
-id:"ORD-"+Date.now(),
-date:new Date().toLocaleString(),
-items:cart,
-subtotal:subtotal,
-discountPercent:discount*100,
-shipping: shippingCost,
-total: extractPrice(totalEl.textContent),
-promocode: promoInput.value.trim(),
-customer:{
-name:fullName.value,
-email:email.value,
-phone:phone.value,
-address:address.value,
-city:city.value,
-notes:notes.value,
-paymentMethod:paymentMethod.value
-}
-};
+let itemsText=cart.map(i=>`- ${i.name} ($${price(i.price).toFixed(2)})`).join("\n");
 
-const orders=JSON.parse(localStorage.getItem("orders"))||[];
-orders.push(order);
-localStorage.setItem("orders",JSON.stringify(orders));
+let msg=`🛒 *New Order*
+Name: ${fullName.value}
+Phone: ${phone.value}
+City: ${city.value}
+Address: ${address.value}
+Notes: ${notes.value || "None"}
 
-generateOrderPDF(order);
-
-let itemsText = order.items.map(i=>{
-const p=extractPrice(i.price);
-return `- ${i.name}: $${p.toFixed(2)}`;
-}).join("\n");
-
-let msg=`🛒 *New Order* 🛒
-Order ID: ${order.id}
-Date: ${order.date}
-
-*Customer Info*
-Name: ${order.customer.name}
-Phone: ${order.customer.phone}
-City: ${order.customer.city}
-Address: ${order.customer.address}
-Notes: ${order.customer.notes || "None"}
-Payment: ${order.customer.paymentMethod}
-
-*Products*
+*Items*
 ${itemsText}
 
-Subtotal: $${order.subtotal.toFixed(2)}
-Discount: ${order.discountPercent.toFixed(0)}%
-Shipping: $${order.shipping.toFixed(2)}
-Total: $${order.total.toFixed(2)}
-Promo code: ${order.promocode || "None"}`;
+Subtotal: $${subtotal.toFixed(2)}
+Discount: ${discount*100}%
+Shipping: $${shipping.toFixed(2)}
+Total: $${total.toFixed(2)}`;
 
-const whatsappURL=`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+let url=`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
 
-setTimeout(()=>{
-window.open(whatsappURL,"_blank");
 localStorage.removeItem("cart");
-window.location.href="thankyou.html?order="+order.id;
-},800);
+window.location.href=url;
 });
 
 renderSummary();
 </script>
+
 </body>
 </html>
