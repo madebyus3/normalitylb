@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orders - Admin View</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        .orders-wrapper {
+            max-width: 1000px;
+            margin: 4rem auto;
+            padding: 1rem;
+        }
+        .order-card {
+            background: white;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .order-title {
+            font-size: 1.3rem;
+            color: #c3026c;
+            font-weight: 700;
+        }
+        .order-section-title {
+            margin-top: 1rem;
+            font-weight: 700;
+            color: #444;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        .btn-clear {
+            margin-top: 1rem;
+            padding: 0.7rem 1.3rem;
+            background: #c3026c;
+            color: white;
+            border-radius: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo"><a href="index.html">Normalitylb</a></div>
+             <!-- NAVIGATION -->
+<nav class="nav" id="navMenu">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="products.html" class="nav-link">Products</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="orders.html" class="nav-link">Orders</a>
+</nav>
+
+<!-- HAMBURGER BUTTON -->
+<button class="menu-btn" id="menuBtn">
+    ☰
+</button>
+            <a href="cart.html" class="cart-icon">
+                <svg width="24" height="24" fill="none" stroke="currentColor">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
+                </svg>
+                <span class="cart-count">0</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="orders-wrapper">
+        <h1 style="color:#c3026c; text-align:center;">Saved Orders</h1>
+        <p style="text-align:center; color:#555;">All orders saved locally from customers checkout</p>
+
+        <div id="ordersContainer"></div>
+
+        <div style="text-align:center; margin-top:2rem;">
+            <button id="clearOrders" class="btn-clear">Clear All Orders</button>
+        </div>
+    </main>
+
+    <script>
+        // Load orders
+        const orders = JSON.parse(localStorage.getItem("orders") || "[]");
+        const container = document.getElementById("ordersContainer");
+
+        function renderOrders() {
+            container.innerHTML = "";
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <p style="text-align:center; color:#666; margin-top:2rem;">
+                        No orders found.
+                    </p>`;
+                return;
+            }
+
+            orders.forEach(order => {
+                const card = document.createElement("div");
+                card.className = "order-card";
+
+                card.innerHTML = `
+                    <div class="order-header">
+                        <div class="order-title">Order #${order.id}</div>
+                        <div style="color:#888;">${new Date(order.createdAt).toLocaleString()}</div>
+                    </div>
+
+                    <div class="order-section-title">Customer Info</div>
+                    <p><strong>Name:</strong> ${order.customer.name}</p>
+                    <p><strong>Phone:</strong> ${order.customer.phone}</p>
+                    <p><strong>Email:</strong> ${order.customer.email}</p>
+                    <p><strong>Address:</strong> ${order.customer.address}, ${order.customer.city}</p>
+                    <p><strong>Payment:</strong> ${order.customer.paymentMethod}</p>
+                    ${order.customer.notes ? `<p><strong>Notes:</strong> ${order.customer.notes}</p>` : ""}
+
+                    <div class="order-section-title">Items</div>
+                `;
+
+                order.items.forEach(item => {
+                    const div = document.createElement("div");
+                    div.className = "order-item";
+                    div.innerHTML = `
+                        <span>${item.name}</span>
+                        <span>${item.price}$</span>
+                    `;
+                    card.appendChild(div);
+                });
+
+                card.innerHTML += `
+                    <div class="order-section-title">Total</div>
+                    <p><strong>Subtotal:</strong> $${order.subtotal}</p>
+                    <p><strong>Total:</strong> <span style="color:#c3026c;">$${order.total}</span></p>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        renderOrders();
+
+        // Clear all orders
+        document.getElementById("clearOrders").addEventListener("click", () => {
+            if (confirm("Are you sure you want to delete ALL orders?")) {
+                localStorage.removeItem("orders");
+                window.location.reload();
+            }
+        });
+
+        // Update cart count
+        const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+        document.querySelectorAll(".cart-count").forEach(el => {
+            el.textContent = cart.length;
+        });
+    </script>
+</body>
+</html>
