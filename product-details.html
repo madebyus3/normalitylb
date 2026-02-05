@@ -5,24 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Product Details - Normalitylb</title>
 <link rel="stylesheet" href="styles.css">
+
 <style>
-  /* Tabs Styles */
-  .tabs { margin-top: 20px; }
-  .tab-buttons { display: flex; gap: 10px; margin-bottom: 10px; }
-  .tab-buttons button {
-      padding: 8px 15px; border: none; cursor: pointer; background: #eee;
-      border-radius: 5px; transition: 0.2s;
-  }
-  .tab-buttons button.active {
-      background: #c3026c; color: white;
-  }
-  .tab-content {
-      display: none; background: #f9f9f9; padding: 15px; border-radius: 8px;
-  }
-  .tab-content.active { display: block; }
-  .variant-option img { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; cursor: pointer; }
+/* ===== TABS ===== */
+.tabs { margin-top: 25px; }
+.tab-buttons { display: flex; gap: 10px; margin-bottom: 10px; }
+.tab-buttons button {
+  padding: 8px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  background: #eee;
+}
+.tab-buttons button.active {
+  background: #c3026c;
+  color: #fff;
+}
+.tab-content {
+  display: none;
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+}
+.tab-content.active { display: block; }
+
+/* ===== VARIANTS ===== */
+.variants {
+  display: flex;
+  gap: 12px;
+  margin-top: 15px;
+}
+.variant-option {
+  text-align: center;
+  cursor: pointer;
+}
+.variant-option img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.variant-option.out {
+  opacity: 0.4;
+}
+.out-of-stock {
+  color: red;
+  font-weight: bold;
+  margin-top: 6px;
+  font-size: 13px;
+}
 </style>
 </head>
+
 <body style="padding-top:120px;">
 
 <div class="container" id="detailsContainer"></div>
@@ -30,102 +64,131 @@
 <script>
 const product = JSON.parse(localStorage.getItem("selectedProduct"));
 const container = document.getElementById("detailsContainer");
+let selectedVariant = null;
 
-if(!product){
-    container.innerHTML = "<h1>No product found</h1>";
-}else{
-    let mainImage = product.image;
-    let productTitleText = product.name;
-    let variantsHTML = "";
+if (!product) {
+  container.innerHTML = "<h2>No product found</h2>";
+} else {
 
-    // إذا فيه Variants
-    if(product.variants && product.variants.length > 0){
-        mainImage = product.variants[0].image;
-        productTitleText = `${product.name} - ${product.variants[0].name}`;
+  let mainImage = product.image;
+  let titleText = product.name;
+  let inStock = product.stock === "available";
+  let variantsHTML = "";
 
-        variantsHTML = `
-        <h4 style="margin-top:15px;">Choose scent:</h4>
-        <div style="display:flex;gap:10px;margin-bottom:15px;">
+  /* ===== VARIANTS ===== */
+  if (product.variants && product.variants.length > 0) {
+    selectedVariant = product.variants[0];
+    mainImage = selectedVariant.image;
+    titleText = product.name + " - " + selectedVariant.name;
+    inStock = selectedVariant.stock === "available";
+
+    variantsHTML = `
+      <h4>Choose scent:</h4>
+      <div class="variants">
         ${product.variants.map(v => `
-            <div class="variant-option" onclick="changeVariant('${v.image}','${v.name}')">
-                <img src="${v.image}" alt="${v.name}">
-                <small>${v.name}</small>
-            </div>
-        `).join('')}
-        </div>
-        `;
-    }
-
-    container.innerHTML = `
-        <a href="products.html" class="back-btn">← Back to Products</a>
-        <div class="product-details-wrapper">
-            <div>
-                <img id="mainImage" src="${mainImage}" class="product-details-image">
-                ${variantsHTML}
-            </div>
-            <div class="product-details-info">
-                <h2 id="productTitle">${productTitleText}</h2>
-                <p>${product.description}</p>
-                <h2>${product.price}</h2>
-
-                <div class="tabs">
-                    <div class="tab-buttons">
-                        <button class="tab-btn active" data-tab="howToUse">How to Use</button>
-                        <button class="tab-btn" data-tab="ingredients">Ingredients</button>
-                        <button class="tab-btn" data-tab="benefits">Benefits</button>
-                    </div>
-                    <div id="howToUse" class="tab-content active">
-                        <p>${product.howToUse}</p>
-                    </div>
-                    <div id="ingredients" class="tab-content">
-                        <p>${product.ingredients}</p>
-                    </div>
-                    <div id="benefits" class="tab-content">
-                        <p>${product.benefits}</p>
-                    </div>
-                </div>
-
-                <button class="big-add-cart" onclick="addVariantToCart()">Add to Cart</button>
-            </div>
-        </div>
+          <div class="variant-option ${v.stock === "out" ? "out" : ""}"
+               onclick="changeVariant('${v.image}','${v.name}','${v.stock}')">
+            <img src="${v.image}">
+            <small>${v.name}</small>
+            ${v.stock === "out" ? `<div class="out-of-stock">Out of Stock</div>` : ""}
+          </div>
+        `).join("")}
+      </div>
     `;
+  }
+
+  container.innerHTML = `
+    <a href="products.html" class="back-btn">← Back to products</a>
+
+    <div class="product-details-wrapper">
+      <div>
+        <img id="mainImage" src="${mainImage}" class="product-details-image">
+        ${variantsHTML}
+      </div>
+
+      <div class="product-details-info">
+        <h2 id="productTitle">${titleText}</h2>
+        <p>${product.description}</p>
+        <h3>${product.price || ""}</h3>
+
+        <div class="tabs">
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="use">How to use</button>
+            <button class="tab-btn" data-tab="ingredients">Ingredients</button>
+            <button class="tab-btn" data-tab="benefits">Benefits</button>
+          </div>
+
+          <div id="use" class="tab-content active">
+            ${product.howToUse || "No instructions available."}
+          </div>
+          <div id="ingredients" class="tab-content">
+            ${product.ingredients || "No ingredients listed."}
+          </div>
+          <div id="benefits" class="tab-content">
+            ${product.benefits || "No benefits listed."}
+          </div>
+        </div>
+
+        <div id="stockArea">
+          ${inStock
+            ? `<button class="big-add-cart" onclick="addToCart()">Add to Cart</button>`
+            : `<div class="out-of-stock">Out of Stock</div>`
+          }
+        </div>
+
+      </div>
+    </div>
+  `;
 }
 
-// ===============================
-// FUNCTIONS
-// ===============================
-function changeVariant(img, name){
-    document.getElementById("mainImage").src = img;
-    document.getElementById("productTitle").textContent = `${product.name} - ${name}`;
+/* ===== CHANGE VARIANT ===== */
+function changeVariant(img, name, stock) {
+  selectedVariant = { image: img, name: name, stock: stock };
+
+  document.getElementById("mainImage").src = img;
+  document.getElementById("productTitle").textContent =
+    product.name + " - " + name;
+
+  const stockArea = document.getElementById("stockArea");
+
+  if (stock === "out") {
+    stockArea.innerHTML = `<div class="out-of-stock">Out of Stock</div>`;
+  } else {
+    stockArea.innerHTML =
+      `<button class="big-add-cart" onclick="addToCart()">Add to Cart</button>`;
+  }
 }
 
-function addVariantToCart(){
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    cart.push({
-        name: document.getElementById("productTitle").textContent,
-        price: product.price,
-        image: document.getElementById("mainImage").src
-    });
-    localStorage.setItem("cart", JSON.stringify(cart));
-    alert("Added to cart 🛒");
+/* ===== ADD TO CART ===== */
+function addToCart() {
+  if (selectedVariant && selectedVariant.stock === "out") {
+    alert("❌ This variant is out of stock");
+    return;
+  }
+
+  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+  cart.push({
+    name: document.getElementById("productTitle").textContent,
+    price: product.price,
+    image: document.getElementById("mainImage").src
+  });
+
+  localStorage.setItem("cart", JSON.stringify(cart));
+  alert("Added to cart 🛒");
 }
 
-// ===============================
-// TABS FUNCTIONALITY
-// ===============================
-const tabButtons = document.querySelectorAll('.tab-btn');
-const tabContents = document.querySelectorAll('.tab-content');
+/* ===== TABS ===== */
+document.addEventListener("click", e => {
+  if (e.target.classList.contains("tab-btn")) {
+    document.querySelectorAll(".tab-btn")
+      .forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-content")
+      .forEach(c => c.classList.remove("active"));
 
-tabButtons.forEach(btn => {
-    btn.addEventListener('click', ()=>{
-        const target = btn.dataset.tab;
-
-        tabButtons.forEach(b => b.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-
-        btn.classList.add('active');
-        document.getElementById(target).classList.add('active');
-    });
+    e.target.classList.add("active");
+    document.getElementById(e.target.dataset.tab)
+      .classList.add("active");
+  }
 });
 </script>
 
