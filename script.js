@@ -1,147 +1,133 @@
-// ===============================
-// CART SYSTEM
-// ===============================
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-function updateCartCount() {
-    const el = document.querySelector(".cart-count");
-    if (el) el.textContent = cart.length;
-}
-
-function saveCart() {
-    localStorage.setItem("cart", JSON.stringify(cart));
-}
-
-function addToCart(product) {
-    cart.push(product);
-    saveCart();
-    updateCartCount();
-}
-
-// ===============================
-// ADD TO CART BUTTON
-// ===============================
-document.addEventListener("click", e => {
-    if (e.target.classList.contains("btn-add-cart")) {
-        const card = e.target.closest(".product-card");
-        if (!card) return;
-
-        addToCart({
-            name: card.querySelector(".product-name")?.textContent || "",
-            price: card.querySelector(".product-price")?.textContent || "",
-            image: card.querySelector("img")?.src || ""
-        });
-
-        e.target.textContent = "Added!";
-        e.target.style.background = "#10b981";
-
-        setTimeout(() => {
-            e.target.textContent = "Add to Cart";
-            e.target.style.background = "#c3026c";
-        }, 800);
-    }
-});
-
-// ===============================
-// PRODUCT CLICK → SAVE TO LOCALSTORAGE
-// ===============================
-document.addEventListener("click", e => {
-    const card = e.target.closest(".product-item");
-    if (card && !e.target.classList.contains("btn-add-cart")) {
-
-        let productData = {
-            name: card.querySelector(".product-name")?.textContent || "",
-            description: card.querySelector(".product-description")?.textContent || "",
-            price: card.querySelector(".product-price")?.textContent || "",
-            image: card.querySelector("img")?.src || "",
-            category: card.querySelector(".product-category")?.textContent || "",
-            howToUse: card.dataset.howtouse || "Instructions not available",
-            ingredients: card.dataset.ingredients || "Ingredients not available",
-            benefits: card.dataset.benefits || "benefits not available"
-        };
-
-        // إذا المنتج special-product، أضف Variants
-        if (card.classList.contains("special-product")) {
-            productData.variants = [
-                { name: "Baby Powder", image: "product1.jpeg" },
-                { name: "Oud", image: "product1.jpeg" },
-                { name: "CocoVanilla", image: "product1.jpeg" }
-            ];
-        }
-
-        localStorage.setItem("selectedProduct", JSON.stringify(productData));
-        window.location.href = "product-details.html";
-    }
-});
-
-// ===============================
-// SCROLL REVEAL ANIMATIONS
-// ===============================
-function reveal() {
-    document.querySelectorAll('.reveal').forEach(el => {
-        if (el.getBoundingClientRect().top < window.innerHeight - 150) {
-            el.classList.add('active');
-        }
-    });
-}
-window.addEventListener('scroll', reveal);
-
-// ===============================
-// ACTIVE NAV LINK
-// ===============================
-function updateActiveNavLink() {
-    const page = window.location.pathname.split('/').pop() || "index.html";
-    document.querySelectorAll(".nav-link").forEach(link => {
-        link.classList.toggle("active", link.getAttribute("href") === page);
-    });
-}
-
-// ===============================
-// INITIALIZATION
-// ===============================
-document.addEventListener("DOMContentLoaded", () => {
-    updateActiveNavLink();
-    updateCartCount();
-    reveal();
-});
-// ===============================
-// DISCOUNT POPUP SYSTEM
-// ===============================
-
-// Show popup once per visit
-window.addEventListener("load", () => {
-
-    if (!localStorage.getItem("discountShown")) {
-        setTimeout(() => {
-            document.getElementById("discount-popup").style.display = "flex";
-            document.getElementById("discount-popup").classList.add("show");
-
-            localStorage.setItem("discountShown", "true");
-        }, 1200);
-    }
-
-});
-
-// Close popup
-function closeDiscount() {
-    let popup = document.getElementById("discount-popup");
-    popup.classList.remove("show");
-
-    setTimeout(() => {
-        popup.style.display = "none";
-    }, 300);
-}
-
-// Go to shop
-function goToShop() {
-    window.location.href = "products.html";
-}
-// ===============================
-// MOBILE MENU TOGGLE
-// ===============================
+/* =========================
+   HAMBURGER MENU (MOBILE)
+========================= */
 const menuBtn = document.getElementById("menuBtn");
 const navMenu = document.getElementById("navMenu");
 
-menuBtn.addEventListener("click", () => {
+if (menuBtn && navMenu) {
+  menuBtn.addEventListener("click", () => {
     navMenu.classList.toggle("show");
+  });
+
+  document.querySelectorAll(".nav-link").forEach(link => {
+    link.addEventListener("click", () => {
+      navMenu.classList.remove("show");
+    });
+  });
+}
+
+/* =========================
+   CART INIT
+========================= */
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function saveCart() {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function updateCartCount() {
+  const countEl = document.querySelector(".cart-count");
+  if (countEl) countEl.textContent = cart.length;
+}
+
+document.addEventListener("DOMContentLoaded", updateCartCount);
+
+/* =========================
+   PRODUCT LIST & ADD TO CART
+========================= */
+document.addEventListener("click", (e) => {
+
+  const card = e.target.closest(".product-item");
+  if (!card) return;
+
+  /* ADD TO CART */
+  if (e.target.classList.contains("btn-add-cart")) {
+    e.stopPropagation();
+
+    const stock = card.dataset.stock || "available";
+    if (stock === "out") {
+      alert("❌ This product is out of stock");
+      return;
+    }
+
+    const name = card.querySelector(".product-name")?.textContent || "";
+    const price = card.querySelector(".product-price")?.textContent || "";
+    const image = card.querySelector("img")?.src || "";
+
+    cart.push({ name, price, image });
+    saveCart();
+    updateCartCount();
+
+    e.target.textContent = "Added ✓";
+    setTimeout(() => {
+      e.target.textContent = "Add to Cart";
+    }, 800);
+
+    return;
+  }
+
+  /* =========================
+     OPEN PRODUCT DETAILS
+  ========================= */
+  const productData = {
+    name: card.querySelector(".product-name")?.textContent || "",
+    description: card.querySelector(".product-description")?.textContent || "",
+    price: card.querySelector(".product-price")?.textContent || "",
+    image: card.querySelector("img")?.src || "",
+    stock: card.dataset.stock || "available",
+    howToUse: card.dataset.howtouse || "",
+    ingredients: card.dataset.ingredients || "",
+    benefits: card.dataset.benefits || ""
+  };
+
+  /* SPECIAL VARIANTS */
+  if (card.classList.contains("special-product")) {
+    productData.variants = [
+      { name: "Baby Powder", image: "product1.jpeg", stock: "available" },
+      { name: "Oud", image: "product1.jpeg", stock: "out" },
+      { name: "CocoVanilla", image: "product1.jpeg", stock: "available" },
+      { name: "Musk", image: "product1.jpeg", stock: "out" }
+    ];
+  }
+
+  localStorage.setItem("selectedProduct", JSON.stringify(productData));
+  window.location.href = "product-details.html";
 });
+
+/* =========================
+   CART PAGE (OPTIONAL)
+========================= */
+function renderCart() {
+  const cartContainer = document.querySelector(".cart-items");
+  if (!cartContainer) return;
+
+  cartContainer.innerHTML = "";
+
+  if (cart.length === 0) {
+    cartContainer.innerHTML = "<p>Your cart is empty</p>";
+    return;
+  }
+
+  cart.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `
+      <img src="${item.image}" width="80">
+      <div>
+        <h4>${item.name}</h4>
+        <p>${item.price}</p>
+        <button onclick="removeFromCart(${index})">Remove</button>
+      </div>
+    `;
+    cartContainer.appendChild(div);
+  });
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  saveCart();
+  updateCartCount();
+  renderCart();
+}
+
+renderCart();
