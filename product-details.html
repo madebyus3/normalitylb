@@ -1,196 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product Details - Normalitylb</title>
-<link rel="stylesheet" href="styles.css">
-
-<style>
-/* ===== TABS ===== */
-.tabs { margin-top: 25px; }
-.tab-buttons { display: flex; gap: 10px; margin-bottom: 10px; }
-.tab-buttons button {
-  padding: 8px 15px;
-  border: none;
-  cursor: pointer;
-  border-radius: 6px;
-  background: #eee;
-}
-.tab-buttons button.active {
-  background: #c3026c;
-  color: #fff;
-}
-.tab-content {
-  display: none;
-  background: #f9f9f9;
-  padding: 15px;
-  border-radius: 8px;
-}
-.tab-content.active { display: block; }
-
-/* ===== VARIANTS ===== */
-.variants {
-  display: flex;
-  gap: 12px;
-  margin-top: 15px;
-}
-.variant-option {
-  text-align: center;
-  cursor: pointer;
-}
-.variant-option img {
-  width: 70px;
-  height: 70px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-.variant-option.out {
-  opacity: 0.4;
-}
-.out-of-stock {
-  color: red;
-  font-weight: bold;
-  margin-top: 6px;
-  font-size: 13px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Normalitylb</title>
+    <meta name="description" content="Browse our collection of natural oil serums and beauty products.">
+    <link rel="stylesheet" href="styles.css">
 </head>
-
-<body style="padding-top:120px;">
-
-<div class="container" id="detailsContainer"></div>
-
-<script>
-const product = JSON.parse(localStorage.getItem("selectedProduct"));
-const container = document.getElementById("detailsContainer");
-let selectedVariant = null;
-
-if (!product) {
-  container.innerHTML = "<h2>No product found</h2>";
-} else {
-
-  let mainImage = product.image;
-  let titleText = product.name;
-  let inStock = product.stock === "available";
-  let variantsHTML = "";
-
-  /* ===== VARIANTS ===== */
-  if (product.variants && product.variants.length > 0) {
-    selectedVariant = product.variants[0];
-    mainImage = selectedVariant.image;
-    titleText = product.name + " - " + selectedVariant.name;
-    inStock = selectedVariant.stock === "available";
-
-    variantsHTML = `
-      <h4>Choose scent:</h4>
-      <div class="variants">
-        ${product.variants.map(v => `
-          <div class="variant-option ${v.stock === "out" ? "out" : ""}"
-               onclick="changeVariant('${v.image}','${v.name}','${v.stock}')">
-            <img src="${v.image}">
-            <small>${v.name}</small>
-            ${v.stock === "out" ? `<div class="out-of-stock">Out of Stock</div>` : ""}
-          </div>
-        `).join("")}
-      </div>
-    `;
-  }
-
-  container.innerHTML = `
-    <a href="products.html" class="back-btn">← Back to products</a>
-
-    <div class="product-details-wrapper">
-      <div>
-        <img id="mainImage" src="${mainImage}" class="product-details-image">
-        ${variantsHTML}
-      </div>
-
-      <div class="product-details-info">
-        <h2 id="productTitle">${titleText}</h2>
-        <p>${product.description}</p>
-        <h3>${product.price || ""}</h3>
-
-        <div class="tabs">
-          <div class="tab-buttons">
-            <button class="tab-btn active" data-tab="use">How to use</button>
-            <button class="tab-btn" data-tab="ingredients">Ingredients</button>
-            <button class="tab-btn" data-tab="benefits">Benefits</button>
-          </div>
-
-          <div id="use" class="tab-content active">
-            ${product.howToUse || "No instructions available."}
-          </div>
-          <div id="ingredients" class="tab-content">
-            ${product.ingredients || "No ingredients listed."}
-          </div>
-          <div id="benefits" class="tab-content">
-            ${product.benefits || "No benefits listed."}
-          </div>
+<body>
+    <!-- Header -->
+    <header class="header">
+    <div class="header-container">
+        <div class="logo">
+            <a href="index.html">Normalitylb</a>
         </div>
 
-        <div id="stockArea">
-          ${inStock
-            ? `<button class="big-add-cart" onclick="addToCart()">Add to Cart</button>`
-            : `<div class="out-of-stock">Out of Stock</div>`
-          }
-        </div>
+          <!-- NAVIGATION -->
+<nav class="nav" id="navMenu">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="products.html" class="nav-link">Products</a>
+    <a href="about.html" class="nav-link">About</a>
+    <a href="contact.html" class="nav-link">Contact</a>
+    <a href="orders.html" class="nav-link">Orders</a>
+</nav>
 
-      </div>
+<!-- HAMBURGER BUTTON -->
+<button class="menu-btn" id="menuBtn">
+    ☰
+</button>
+
+
+        <!-- CART WITH LINK -->
+        <a href="cart.html" class="cart-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
+            </svg>
+            <span class="cart-count">0</span>
+        </a>
     </div>
-  `;
-}
+</header>
 
-/* ===== CHANGE VARIANT ===== */
-function changeVariant(img, name, stock) {
-  selectedVariant = { image: img, name: name, stock: stock };
+<main class="page-wrapper">
+    <section class="products-hero">
+        <h1>Normalitylb Products</h1>
+        <p>Discover our collection of natural cosmetics</p>
+    </section>
 
-  document.getElementById("mainImage").src = img;
-  document.getElementById("productTitle").textContent =
-    product.name + " - " + name;
+    <!-- Products Grid -->
+    <section class="products-section">
+        <div class="products-container">
+            <div class="products-grid">
 
-  const stockArea = document.getElementById("stockArea");
+                <!-- Product 1: special-product -->
+                <div class="product-card reveal product-item special-product"
+                     data-howtouse="Spray and smell amzaing!"
+                     data-ingredients="Moisturizing Ingredients,Distilled Water, Argan Oil, Vitamin E">
+                    <img src="product1.jpeg" alt="Heaven in Hair" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Available</span>
+                        <h3 class="product-name">Heaven in Hair</h3>
+                        <p class="product-description">Hair mist</p>
+                        <div class="product-footer">
+                            <span class="product-price">$10</span>
+                            <button class="btn-add-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
 
-  if (stock === "out") {
-    stockArea.innerHTML = `<div class="out-of-stock">Out of Stock</div>`;
-  } else {
-    stockArea.innerHTML =
-      `<button class="big-add-cart" onclick="addToCart()">Add to Cart</button>`;
-  }
-}
+                <!-- Product 2 -->
+                <div class="product-card reveal product-item"
+                     data-howtouse="OUT OF STOCK"
+                     data-ingredients="OUT OF STOCK">
+                    <img src="this.jpg" alt="Silk Serum" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Out Of Stock</span>
+                        <h3 class="product-name">Silk Serum</h3>
+                        <p class="product-description">Serum</p>
+                        <div class="product-footer">
+                            <span class="product-price">OUT OF STOCK</span>
+                            <button class="btn-add-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
 
-/* ===== ADD TO CART ===== */
-function addToCart() {
-  if (selectedVariant && selectedVariant.stock === "out") {
-    alert("❌ This variant is out of stock");
-    return;
-  }
+                <!-- Product 3 -->
+                <div class="product-card reveal product-item"
+                     data-howtouse="OUT OF STOCK"
+                     data-ingredients="OUT OF STOCK">
+                    <img src="this.jpg" alt="Heat Blocker" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Available</span>
+                        <h3 class="product-name">Heat Blocker</h3>
+                        <p class="product-description">Heat protectant</p>
+                        <div class="product-footer">
+                            <span class="product-price">8$</span>
+                            <button class="btn-add-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
 
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  cart.push({
-    name: document.getElementById("productTitle").textContent,
-    price: product.price,
-    image: document.getElementById("mainImage").src
-  });
+                <!-- Product 4 -->
+                <div class="product-card reveal product-item"
+                     data-howtouse="OUT OF STOCK"
+                     data-ingredients="OUT OF STOCK">
+                    <img src="this.jpg" alt="Rapunzel's Secret" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Out Of Stock</span>
+                        <h3 class="product-name">Rapunzel's Secret</h3>
+                        <p class="product-description">Hair oil</p>
+                        <div class="product-footer">
+                            <span class="product-price">OUT OF STOCK</span>
+                            <button class="btn-add-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
 
-  localStorage.setItem("cart", JSON.stringify(cart));
-  alert("Added to cart 🛒");
-}
+                <!-- Product 5 -->
+                <div class="product-card reveal product-item"
+                     data-howtouse="OUT OF STOCK."
+                     data-ingredients="OUT OF STOCK">
+                    <img src="this.jpg" alt="Tanning Oil" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Out Of Stock</span>
+                        <h3 class="product-name">Tanning Oil</h3>
+                        <p class="product-description">Tan lines</p>
+                        <div class="product-footer">
+                            <span class="product-price">OUT OF STOCK</span>
+                            <button class="btn-add-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
 
-/* ===== TABS ===== */
-document.addEventListener("click", e => {
-  if (e.target.classList.contains("tab-btn")) {
-    document.querySelectorAll(".tab-btn")
-      .forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".tab-content")
-      .forEach(c => c.classList.remove("active"));
+                <!-- Product 6 -->
+                <div class="product-card reveal product-item"
+                     data-howtouse="SPREAD ALL OVER YOUR BODY, AVOID  FACIAL CONTACT AND ENJOY A GOLDEN TAN!."
+                     data-ingredients="CARROT OIL, ARGAN OIL, SESAME OIL, COCOA BUTTER, BEES WAX, NATURAL SCENT.">
+                    <img src="tan-butter.jpg" alt="Tanning Butter" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Available</span>
+                        <h3 class="product-name">Tanning Butter</h3>
+                        <p class="product-description">Tan lines(150gr)</p>
+                        <div class="product-footer">
+                            <span class="product-price">$11</span>
+                            <button class="btn-add-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
 
-    e.target.classList.add("active");
-    document.getElementById(e.target.dataset.tab)
-      .classList.add("active");
-  }
-});
-</script>
+                <!-- Product 7 -->
+                <div class="product-card reveal product-item"
+                     data-howtouse="SPREAD ALL OVER YOUR BADE AFTER SHOWER, AVOID FACIAL CONTACT AND ENJOY A GOLDEN LONG LASTING TAN!."
+                     data-ingredients="SHEA BUTTER, COCONUT OIL, BEES WAX, NATURAL SCENT GLYCERINE, SWEET ALMOND OIL.">
+                    <img src="tan-fix.jpg" alt="Tan Fixer" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Available</span>
+                        <h3 class="product-name">Tanning Fixer</h3>
+                        <p class="product-description">Tan Fixer(150gr)</p>
+                        <div class="product-footer">
+                            <span class="product-price">$11</span>
+                            <button class="btn-add-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- Product 8 -->
+                <div class="product-card reveal product-item"
+                     data-howtouse="USE AFTER SHAMPOO AND LEAVE FOR 10MINS BEFORE RINSING."
+                     data-ingredients="DISTILLED WATER, ARGAN OIL, COLLAGEN, JOJOBA OIL, COCONUT OIL, NATURAL SCENT."
+                     data-benefits="DEEP CONDITIONING AND HAIR REPAIRING FOR HAIR GROWTH AND STRENGTH AS WELL AS DETANGLING AND POTECTING.">
+                    <img src="hair-ramedy.jpg" alt="Hair Remedy" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Available</span>
+                        <h3 class="product-name">Hair Remedy</h3>
+                        <p class="product-description">Hair mask(500gr)</p>
+                        <div class="product-footer">
+                            <span class="product-price">$15</span>
+                            <button class="btn-add-cart">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <!-- Footer content here -->
+</footer>
+
+<script src="script.js"></script>
 </body>
 </html>
