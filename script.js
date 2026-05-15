@@ -84,9 +84,9 @@ document.addEventListener("click", (e) => {
   if (card.classList.contains("special-product")) {
     productData.variants = [
       { name: "Baby Powder", image: "product1.jpeg", stock: "available" },
-      { name: "Oud", image: "product1.jpeg", stock: "out" },
+      { name: "Oud", image: "product1.jpeg", stock: "available" },
       { name: "CocoVanilla", image: "product1.jpeg", stock: "available" },
-      { name: "Musk", image: "product1.jpeg", stock: "out" }
+      { name: "Musk", image: "product1.jpeg", stock: "available" }
     ];
   }
 
