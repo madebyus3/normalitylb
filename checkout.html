@@ -181,7 +181,7 @@ function renderSummary(){
 
 function calculateTotal(){
   const method = paymentMethod.value;
-  shippingCost = method==="cash" ? 4 : 0;
+  shippingCost = method==="cash" ? 5 : 0;
   shippingEl.textContent = shippingCost>0 ? "$"+shippingCost.toFixed(2) : "Free";
 
   let total=subtotal;
