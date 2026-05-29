@@ -81,7 +81,48 @@ document.addEventListener("click", (e) => {
   };
 
   /* SPECIAL VARIANTS */
-  if (card.classList.contains("special-product")) {
+  if (card.classList.contains("special-product0")) {
+    productData.variants = [
+      { name: "Baby Powder", image: "sugarscrub.jpeg", stock: "available" },
+      { name: "Oud", image: "sugarscrub.jpeg", stock: "available" },
+      { name: "CocoVanilla", image: "sugarscrub.jpeg", stock: "available" },
+      { name: "Musk", image: "sugarscrub.jpeg", stock: "available" }
+    ];
+  }
+
+   if (card.classList.contains("special-product1")) {
+    productData.variants = [
+      { name: "Baby Powder", image: "velvetdream.jpeg", stock: "available" },
+      { name: "Oud", image: "velvetdream.jpeg", stock: "available" },
+      { name: "CocoVanilla", image: "velvetdream.jpeg", stock: "available" },
+      { name: "Musk", image: "velvetdream.jpeg", stock: "available" }
+    ];
+  }
+
+
+
+  if (card.classList.contains("special-product2")) {
+    productData.variants = [
+      { name: "Baby Powder", image: "paradise.jpeg", stock: "available" },
+      { name: "Oud", image: "paradise.jpeg", stock: "available" },
+      { name: "CocoVanilla", image: "paradise.jpeg", stock: "available" },
+      { name: "Musk", image: "paradise.jpeg", stock: "available" }
+    ];
+  }
+
+
+
+    if (card.classList.contains("special-product3")) {
+    productData.variants = [
+      { name: "Baby Powder", image: "golden.jpeg", stock: "available" },
+      { name: "Oud", image: "golden.jpeg", stock: "available" },
+      { name: "CocoVanilla", image: "golden.jpeg", stock: "available" },
+      { name: "Musk", image: "golden.jpeg", stock: "available" }
+    ];
+  }
+
+
+  if (card.classList.contains("special-product4")) {
     productData.variants = [
       { name: "Baby Powder", image: "product1.jpeg", stock: "available" },
       { name: "Oud", image: "product1.jpeg", stock: "available" },
